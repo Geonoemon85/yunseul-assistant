@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>윤슬향방 사장님 비서 | 매출 장부</title>
+  <!-- Google 공식 로그인 스크립트 (Google Identity Services) -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FAF7F2;
+      --card: #FFFFFF;
+      --primary: #8C6239;
+      --primary-dark: #6E4B26;
+      --primary-soft: #F3ECE2;
+      --accent: #C89B6E;
+      --text: #2C2520;
+      --text-sub: #7A6F66;
+      --border: #E8DFD3;
+      --success: #2D6A4F;
+      --success-bg: #E8F5E9;
+      --danger: #C93B2B;
+      --danger-bg: #FDEDEC;
+      --shadow: 0 8px 24px rgba(74, 53, 32, 0.07);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Malgun Gothic', sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 18px 16px 60px;
+    }
+
+    /* 상단 헤더 */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding: 4px 2px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #8C6239, #C89B6E);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Gowun Batang', serif;
+      font-weight: 700;
+      font-size: 19px;
+      box-shadow: 0 4px 12px rgba(140, 98, 57, 0.25);
+    }
+
+    .brand-text h1 {
+      margin: 0;
+      font-family: 'Gowun Batang', serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .brand-text p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 11px;
+      border-radius: 11px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.97);
+      background: var(--primary-soft);
+    }
+
+    /* 카드 공통 */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text);
+    }
+
+    /* 로그인 화면 (사장님·스태프 전용 게이트) */
+    .login-card {
+      text-align: center;
+      padding: 30px 22px;
+    }
+
+    .login-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 99px;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .login-title {
+      font-family: 'Gowun Batang', serif;
+      font-size: 22px;
+      margin: 0 0 8px;
+      color: var(--text);
+    }
+
+    .login-desc {
+      font-size: 13.5px;
+      color: var(--text-sub);
+      margin: 0 0 22px;
+      word-break: keep-all;
+    }
+
+    .google-btn-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      margin-bottom: 14px;
+    }
+
+    .demo-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 0 14px;
+      color: var(--text-sub);
+      font-size: 12px;
+    }
+
+    .demo-divider::before,
+    .demo-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* 로그인된 사용자 표시 바 */
+    .user-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--primary-soft);
+      border: 1px solid var(--border);
+      padding: 9px 14px;
+      border-radius: 13px;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      flex-shrink: 0;
+    }
+
+    .status-dot.demo {
+      background: #E07A27;
+    }
+
+    .user-email {
+      font-weight: 600;
+      color: var(--primary-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-sub);
+      font-size: 12px;
+      text-decoration: underline;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* 음성 입력 버튼 & 텍스트창 */
+    .mic-btn {
+      width: 100%;
+      padding: 18px 16px;
+      border-radius: 16px;
+      border: 2px solid var(--primary);
+      background: linear-gradient(135deg, #8C6239, #A47548);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 6px 18px rgba(140, 98, 57, 0.25);
+      transition: all 0.2s ease;
+      margin-bottom: 12px;
+    }
+
+    .mic-btn.listening {
+      background: linear-gradient(135deg, #C93B2B, #E05344);
+      border-color: #C93B2B;
+      animation: pulse 1.3s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(201, 59, 43, 0.45); }
+      70% { box-shadow: 0 0 0 14px rgba(201, 59, 43, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(201, 59, 43, 0); }
+    }
+
+    .speech-textarea {
+      width: 100%;
+      min-height: 82px;
+      padding: 13px 14px;
+      border-radius: 13px;
+      border: 1.5px solid var(--border);
+      background: #FCFBF9;
+      font-size: 15px;
+      color: var(--text);
+      resize: vertical;
+      font-family: inherit;
+      margin-bottom: 10px;
+    }
+
+    .speech-textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    .example-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .example-chip {
+      background: var(--primary-soft);
+      border: 1px solid var(--border);
+      color: var(--primary-dark);
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 99px;
+      cursor: pointer;
+    }
+
+    .parse-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 13px;
+      border: 1.5px solid var(--primary);
+      background: #fff;
+      color: var(--primary-dark);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .parse-btn:hover, .parse-btn:active {
+      background: var(--primary-soft);
+    }
+
+    .parse-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    /* 7개 항목 확인 및 수정 폼 */
+    .form-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 10px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .field-input, .field-select {
+      width: 100%;
+      padding: 11px 13px;
+      border-radius: 11px;
+      border: 1.5px solid var(--border);
+      background: #fff;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      font-family: inherit;
+    }
+
+    .field-input:focus, .field-select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* 빠른 선택 칩 (구분, 결제수단, 유입경로, 금액) */
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pill-btn {
+      padding: 7px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #FAF8F5;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .pill-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* 인원 조절 스테퍼 */
+    .stepper {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .stepper button {
+      width: 40px;
+      height: 42px;
+      border: none;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .stepper input {
+      width: 100%;
+      border: none;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      padding: 0;
+      height: 42px;
+    }
+
+    .stepper input:focus {
+      outline: none;
+    }
+
+    .amount-preview {
+      font-size: 12.5px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* 한 줄 요약 미리보기 박스 */
+    .one-line-preview {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #FAF6F0;
+      border: 1px dashed var(--accent);
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .one-line-preview strong {
+      display: block;
+      font-size: 11.5px;
+      color: var(--primary-dark);
+      margin-bottom: 4px;
+    }
+
+    /* 시트 저장 버튼 */
+    .save-btn {
+      margin-top: 14px;
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: var(--success);
+      color: #fff;
+      font-size: 16.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(45, 106, 79, 0.25);
+      transition: all 0.15s ease;
+    }
+
+    .save-btn:active {
+      transform: scale(0.99);
+    }
+
+    .save-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    /* 알림 메시지 배너 */
+    .banner {
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 14px;
+      display: none;
+      word-break: keep-all;
+    }
+
+    .banner.success {
+      display: block;
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid #B7E4C7;
+    }
+
+    .banner.error {
+      display: block;
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #F5B7B1;
+    }
+
+    /* 최근 저장 내역 리스트 */
+    .recent-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .recent-item {
+      padding: 11px 13px;
+      border-radius: 12px;
+      background: #FAF8F5;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .recent-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .recent-top {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .recent-sub {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .recent-amount {
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    /* 설정 & 가이드 모달 */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(30, 22, 15, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--card);
+      width: 100%;
+      max-width: 480px;
+      max-height: 88vh;
+      border-radius: 20px;
+      padding: 22px 20px;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .guide-step {
+      background: #FAF8F5;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .guide-step strong {
+      color: var(--primary-dark);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 상단 헤더 -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-logo">윤</div>
+        <div class="brand-text">
+          <h1>윤슬향방 사장님 비서</h1>
+          <p>음성으로 말하고 확인 후 시트에 한 줄 저장</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="icon-btn" id="openSettingsBtn">⚙️ 설정·연결</button>
+      </div>
+    </header>
+
+    <!-- 알림 메시지 -->
+    <div id="statusBanner" class="banner"></div>
+
+    <!-- 1. 로그인 화면 (사장님·스태프 지정 구글 계정 전용) -->
+    <section id="loginSection" class="card login-card">
+      <span class="login-badge">🔒 사장님 · 스태프 전용</span>
+      <h2 class="login-title">윤슬향방 매출 장부</h2>
+      <p class="login-desc">
+        사장님과 지정된 스태프의 구글 계정으로만<br />
+        접속 및 장부 기록이 가능합니다.
+      </p>
+
+      <!-- Google 공식 로그인 버튼이 렌더링되는 영역 -->
+      <div class="google-btn-wrap">
+        <div id="googleSignInBtn"></div>
+        <p id="googleSetupHint" style="font-size:12px; color:var(--text-sub); margin:8px 0 0;">
+          아직 연결 설정 전이라면 우측 상단 <b>[⚙️ 설정·연결]</b>을 눌러주세요.
+        </p>
+      </div>
+
+      <div class="demo-divider">연결 전 화면 먼저 써보기</div>
+      <button type="button" class="parse-btn" id="startDemoBtn">
+        ✨ 연결 전 체험 모드로 화면 열기
+      </button>
+    </section>
+
+    <!-- 2. 메인 비서 화면 (로그인 후 표시) -->
+    <main id="mainSection" class="hidden">
+      <!-- 현재 접속 계정 표시줄 -->
+      <div class="user-bar">
+        <div class="user-info">
+          <span id="userStatusDot" class="status-dot"></span>
+          <span id="userEmailLabel" class="user-email">사장님 계정 접속 중</span>
+        </div>
+        <button type="button" class="logout-btn" id="logoutBtn">로그아웃</button>
+      </div>
+
+      <!-- STEP 1: 음성으로 말하기 -->
+      <section class="card">
+        <h2 class="card-title">
+          <span>1️⃣ 수업·판매 내용 말하기</span>
+          <span style="font-size:12px; font-weight:500; color:var(--text-sub);">음성 또는 글자 입력</span>
+        </h2>
+
+        <button type="button" class="mic-btn" id="micBtn">
+          <span id="micIcon">🎙️</span>
+          <span id="micBtnText">눌러서 말하기 (음성 인식)</span>
+        </button>
+
+        <textarea
+          id="speechInput"
+          class="speech-textarea"
+          placeholder="예: 오늘 원데이 클래스 2명 7만원 카드, 인스타 보고 옴"
+        ></textarea>
+
+        <div class="example-chips">
+          <button type="button" class="example-chip" data-sample="오늘 원데이 클래스 2명 7만원 카드, 인스타 보고 옴">
+            예시 1: 원데이 2명 7만원 카드 인스타
+          </button>
+          <button type="button" class="example-chip" data-sample="오늘 취미반 1명 12만원 계좌이체, 네이버 블로그 보고 오심, 우디향 선호">
+            예시 2: 취미반 1명 12만원 이체 블로그
+          </button>
+          <button type="button" class="example-chip" data-sample="답례품 디퓨저 판매 1명 15만원 포항사랑상품권, 지인 추천">
+            예시 3: 답례품 15만원 포항사랑상품권
+          </button>
+        </div>
+
+        <button type="button" class="parse-btn" id="parseBtn">
+          🤖 AI로 7개 항목 자동 정리하기
+        </button>
+      </section>
+
+      <!-- STEP 2: AI 정리 결과 확인 및 수정 후 저장 -->
+      <section class="card" id="confirmCard">
+        <h2 class="card-title">
+          <span>2️⃣ 정리된 내용 확인 · 수정</span>
+          <span id="aiModeBadge" style="font-size:11.5px; color:var(--primary); font-weight:600;">터치해서 바로 수정 가능</span>
+        </h2>
+
+        <div class="form-grid">
+          <!-- 날짜 & 인원 -->
+          <div class="field-row-2">
+            <div class="field-group">
+              <label class="field-label" for="fieldDate">📅 날짜</label>
+              <input type="date" id="fieldDate" class="field-input" />
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="fieldPeople">👥 인원 (명)</label>
+              <div class="stepper">
+                <button type="button" id="peopleMinusBtn">−</button>
+                <input type="number" id="fieldPeople" min="1" max="999" value="2" />
+                <button type="button" id="peoplePlusBtn">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 구분 (4개 항목 중 선택) -->
+          <div class="field-group">
+            <label class="field-label">🏷️ 구분</label>
+            <div class="pill-group" id="categoryPills">
+              <button type="button" class="pill-btn active" data-val="원데이 클래스">원데이 클래스</button>
+              <button type="button" class="pill-btn" data-val="취미·자격증반">취미·자격증반</button>
+              <button type="button" class="pill-btn" data-val="완제품·답례품 판매">완제품·답례품 판매</button>
+              <button type="button" class="pill-btn" data-val="기타">기타</button>
+            </div>
+            <input type="hidden" id="fieldCategory" value="원데이 클래스" />
+          </div>
+
+          <!-- 금액 -->
+          <div class="field-group">
+            <label class="field-label" for="fieldAmount">
+              <span>💰 금액 (원)</span>
+              <span id="amountPreview" class="amount-preview">70,000원</span>
+            </label>
+            <input
+              type="number"
+              id="fieldAmount"
+              class="field-input"
+              step="1000"
+              min="0"
+              placeholder="숫자만 입력 (예: 70000)"
+              value="70000"
+            />
+            <div class="pill-group" style="margin-top:4px;">
+              <button type="button" class="pill-btn amt-quick" data-amt="35000">3.5만</button>
+              <button type="button" class="pill-btn amt-quick" data-amt="50000">5만</button>
+              <button type="button" class="pill-btn amt-quick" data-amt="70000">7만</button>
+              <button type="button" class="pill-btn amt-quick" data-amt="100000">10만</button>
+              <button type="button" class="pill-btn amt-quick" data-amt="140000">14만</button>
+            </div>
+          </div>
+
+          <!-- 결제수단 -->
+          <div class="field-group">
+            <label class="field-label" for="fieldPayment">💳 결제수단</label>
+            <div class="pill-group" id="paymentPills">
+              <button type="button" class="pill-btn active" data-val="카드">카드</button>
+              <button type="button" class="pill-btn" data-val="계좌이체">계좌이체</button>
+              <button type="button" class="pill-btn" data-val="현금">현금</button>
+              <button type="button" class="pill-btn" data-val="네이버페이">네이버페이</button>
+              <button type="button" class="pill-btn" data-val="포항사랑상품권">포항사랑상품권</button>
+              <button type="button" class="pill-btn" data-val="기타">기타</button>
+            </div>
+            <input type="text" id="fieldPayment" class="field-input" value="카드" placeholder="결제수단 직접 입력 가능" />
+          </div>
+
+          <!-- 유입경로 -->
+          <div class="field-group">
+            <label class="field-label" for="fieldChannel">🧭 유입경로</label>
+            <div class="pill-group" id="channelPills">
+              <button type="button" class="pill-btn active" data-val="인스타그램">인스타그램</button>
+              <button type="button" class="pill-btn" data-val="네이버 예약">네이버 예약</button>
+              <button type="button" class="pill-btn" data-val="네이버 검색/블로그">네이버 검색/블로그</button>
+              <button type="button" class="pill-btn" data-val="지인 추천">지인 추천</button>
+              <button type="button" class="pill-btn" data-val="재방문">재방문</button>
+              <button type="button" class="pill-btn" data-val="워크인(지나가다)">워크인(지나가다)</button>
+              <button type="button" class="pill-btn" data-val="당근">당근</button>
+              <button type="button" class="pill-btn" data-val="기타">기타</button>
+            </div>
+            <input type="text" id="fieldChannel" class="field-input" value="인스타그램" placeholder="유입경로 직접 입력 가능" />
+          </div>
+
+          <!-- 비고(메모) -->
+          <div class="field-group">
+            <label class="field-label" for="fieldMemo">📝 비고 (메모 · 선택사항)</label>
+            <input
+              type="text"
+              id="fieldMemo"
+              class="field-input"
+              placeholder="향 취향, 예약자 성함, 포장 여부 등 메모"
+            />
+          </div>
+        </div>
+
+        <!-- 시트에 들어갈 한 줄 요약 미리보기 -->
+        <div class="one-line-preview">
+          <strong>📊 「윤슬향방 매출 장부」에 저장될 한 줄 미리보기</strong>
+          <span id="oneLineSummaryText">2026-10-27 | 원데이 클래스 | 2명 | 70,000원 | 카드 | 인스타그램 | -</span>
+        </div>
+
+        <button type="button" class="save-btn" id="saveBtn">
+          ✅ 확인 완료! 구글 시트에 한 줄 저장
+        </button>
+      </section>
+
+      <!-- 최근 저장된 장부 내역 -->
+      <section class="card">
+        <h2 class="card-title">
+          <span>📋 최근 저장된 내역 (최근 5건)</span>
+          <span style="font-size:12px; font-weight:500; color:var(--text-sub);">중복 저장 방지 확인용</span>
+        </h2>
+        <div id="recentList" class="recent-list">
+          <div style="text-align:center; padding:14px; color:var(--text-sub); font-size:13px;">
+            저장된 최근 내역이 여기에 표시됩니다.
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ⚙️ 설정 및 연결 안내 모달 -->
+  <div id="settingsModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>⚙️ 구글 시트 & 로그인 연결 설정</h2>
+        <button type="button" class="icon-btn" id="closeSettingsBtn">닫기 ✕</button>
+      </div>
+
+      <p style="font-size:13px; color:var(--text-sub); margin-top:0;">
+        아래 두 칸에 주소를 붙여넣고 [설정 저장]을 누르거나, 나중에 GitHub에 올릴 때 <code>index.html</code> 상단 기본값에 적어두시면 됩니다.
+      </p>
+
+      <div class="form-grid" style="margin-bottom:16px;">
+        <div class="field-group">
+          <label class="field-label" for="cfgScriptUrl">1. Apps Script 웹 앱 URL (창구 주소)</label>
+          <input
+            type="url"
+            id="cfgScriptUrl"
+            class="field-input"
+            placeholder="https://script.google.com/macros/s/.../exec"
+          />
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="cfgClientId">2. Google 로그인 클라이언트 ID</label>
+          <input
+            type="text"
+            id="cfgClientId"
+            class="field-input"
+            placeholder="123456789-xxx.apps.googleusercontent.com"
+          />
+        </div>
+
+        <button type="button" class="save-btn" id="saveConfigBtn" style="margin-top:4px; padding:13px;">
+          💾 설정 저장 및 적용하기
+        </button>
+      </div>
+
+      <hr style="border:none; border-top:1px solid var(--border); margin:18px 0;" />
+
+      <h3 style="font-size:14.5px; margin:0 0 10px;">📖 코딩 몰라도 되는 4단계 연결 요약</h3>
+
+      <div class="guide-step">
+        <strong>① 무료 Gemini API 키 → 스크립트 속성에 등록 (1분)</strong>
+        <b>Google AI Studio</b>에서 발급받은 키를 복사 → Apps Script 왼쪽 메뉴 <b>[프로젝트 설정(⚙️)] → 맨 아래 [스크립트 속성 추가]</b> 클릭 → 속성 이름에 <code>GEMINI_API_KEY</code>, 값에 복사한 키를 넣고 저장! (코드에 키가 남지 않아 GitHub에 올려도 안전합니다)
+      </div>
+
+      <div class="guide-step">
+        <strong>② 사장님 · 스태프 이메일 등록</strong>
+        <code>Code.gs</code> 맨 위 <code>ALLOWED_EMAILS</code>에 사장님과 스태프의 <code>@gmail.com</code> 주소를 적어주세요. (여기에 적힌 사람만 접속됩니다)
+      </div>
+
+      <div class="guide-step">
+        <strong>③ 구글 시트에 Code.gs 붙이고 웹 앱 배포</strong>
+        「윤슬향방 매출 장부」 시트 상단 메뉴 <b>[확장 프로그램] → [Apps Script]</b> 클릭 → <code>Code.gs</code> 내용 붙여넣기 → 우측 상단 <b>[배포] → [새 배포]</b> → 유형: <b>웹 앱</b>, 다음 사용자로 실행: <b>나</b>, 액세스 권한: <b>모든 사용자</b>로 배포 후 나온 웹 앱 URL을 위 1번 칸에 붙여넣기!
+      </div>
+
+      <div class="guide-step">
+        <strong>④ 구글 로그인 버튼용 클라이언트 ID 발급</strong>
+        <b>Google Cloud Console</b> → [API 및 서비스] → [사용자 인증 정보] → [+ 사용자 인증 정보 만들기] → <b>OAuth 클라이언트 ID (웹 애플리케이션)</b> 선택 → [승인된 자바스크립트 원본]에 Vercel 주소(예: <code>https://내주소.vercel.app</code>) 추가 후 발급된 클라이언트 ID를 위 2번 칸에 붙여넣기!
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ============================================================================
+     * 🌸 [사장님 설정 영역] 나중에 GitHub → Vercel에 올리실 때
+     * 아래 작은따옴표('') 안에 주소를 넣어두시면 모든 휴대폰에서 별도 설정 없이 바로 작동합니다!
+     * ============================================================================
+     */
+    const DEFAULT_APPS_SCRIPT_URL = ''; // 예: 'https://script.google.com/macros/s/AKfycb.../exec'
+    const DEFAULT_GOOGLE_CLIENT_ID = ''; // 예: '1234567890-abcdefg.apps.googleusercontent.com'
+
+    // 상태 관리 변수
+    let currentIdToken = sessionStorage.getItem('yunseul_id_token') || '';
+    let currentUserEmail = sessionStorage.getItem('yunseul_user_email') || '';
+    let isDemoMode = false;
+    let recognition = null;
+    let isListening = false;
+
+    // DOM 요소
+    const loginSection = document.getElementById('loginSection');
+    const mainSection = document.getElementById('mainSection');
+    const statusBanner = document.getElementById('statusBanner');
+    const userStatusDot = document.getElementById('userStatusDot');
+    const userEmailLabel = document.getElementById('userEmailLabel');
+
+    const fieldDate = document.getElementById('fieldDate');
+    const fieldCategory = document.getElementById('fieldCategory');
+    const fieldPeople = document.getElementById('fieldPeople');
+    const fieldAmount = document.getElementById('fieldAmount');
+    const fieldPayment = document.getElementById('fieldPayment');
+    const fieldChannel = document.getElementById('fieldChannel');
+    const fieldMemo = document.getElementById('fieldMemo');
+    const amountPreview = document.getElementById('amountPreview');
+    const oneLineSummaryText = document.getElementById('oneLineSummaryText');
+
+    // 설정값 불러오기 (코드 기본값 우선, 없으면 브라우저 저장값 사용)
+    function getAppsScriptUrl() {
+      return (DEFAULT_APPS_SCRIPT_URL || localStorage.getItem('yunseul_script_url') || '').trim();
+    }
+
+    function getGoogleClientId() {
+      return (DEFAULT_GOOGLE_CLIENT_ID || localStorage.getItem('yunseul_client_id') || '').trim();
+    }
+
+    // 오늘 날짜 (YYYY-MM-DD)
+    function getTodayString() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    // 알림 배너 표시
+    function showBanner(msg, type = 'success') {
+      statusBanner.textContent = msg;
+      statusBanner.className = `banner ${type}`;
+      if (type === 'success') {
+        setTimeout(() => {
+          if (statusBanner.textContent === msg) {
+            statusBanner.className = 'banner';
+          }
+        }, 5000);
+      }
+    }
+
+    function clearBanner() {
+      statusBanner.className = 'banner';
+      statusBanner.textContent = '';
+    }
+
+    // 초기화
+    window.addEventListener('DOMContentLoaded', () => {
+      fieldDate.value = getTodayString();
+      updatePreviewSummary();
+      initSpeechRecognition();
+      initGoogleSignIn();
+
+      // 이미 로그인 토큰이 남아있는 경우 자동 검증
+      if (currentIdToken && getAppsScriptUrl()) {
+        verifyLoginWithServer(currentIdToken);
+      }
+    });
+
+    /**
+     * ============================================================================
+     * 🔐 Google 로그인 초기화 및 서버 승인 계정 확인
+     * ============================================================================
+     */
+    function initGoogleSignIn() {
+      const clientId = getGoogleClientId();
+      const btnContainer = document.getElementById('googleSignInBtn');
+      const hintEl = document.getElementById('googleSetupHint');
+
+      if (!clientId) {
+        btnContainer.innerHTML = `
+          <button type="button" class="icon-btn" style="padding:12px 18px; font-size:14px;" onclick="document.getElementById('openSettingsBtn').click()">
+            🔑 Google 로그인 연결 설정하기
+          </button>
+        `;
+        return;
+      }
+
+      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+        setTimeout(initGoogleSignIn, 400);
+        return;
+      }
+
+      hintEl.textContent = '사장님 또는 지정된 스태프 구글 계정으로 로그인해 주세요.';
+      btnContainer.innerHTML = '';
+
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleCredentialResponse,
+        auto_select: true
+      });
+
+      window.google.accounts.id.renderButton(btnContainer, {
+        theme: 'outline',
+        size: 'large',
+        shape: 'pill',
+        text: 'signin_with',
+        width: 280,
+        locale: 'ko'
+      });
+    }
+
+    async function handleGoogleCredentialResponse(response) {
+      if (!response || !response.credential) {
+        showBanner('구글 로그인 정보를 받지 못했습니다.', 'error');
+        return;
+      }
+      const idToken = response.credential;
+      await verifyLoginWithServer(idToken);
+    }
+
+    async function verifyLoginWithServer(idToken) {
+      const scriptUrl = getAppsScriptUrl();
+      if (!scriptUrl) {
+        showBanner('우측 상단 [⚙️ 설정·연결]에서 Apps Script 웹 앱 URL을 먼저 입력해 주세요.', 'error');
+        return;
+      }
+
+      try {
+        showBanner('구글 계정 승인 여부를 확인하고 있습니다...', 'success');
+        const res = await fetch(scriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'auth_check',
+            idToken: idToken
+          })
+        });
+
+        const result = await res.json();
+        if (!result.ok) {
+          sessionStorage.removeItem('yunseul_id_token');
+          sessionStorage.removeItem('yunseul_user_email');
+          showBanner(result.error || '승인되지 않은 구글 계정입니다.', 'error');
+          return;
+        }
+
+        // 승인된 사장님/스태프 계정 로그인 성공!
+        currentIdToken = idToken;
+        currentUserEmail = result.user.email;
+        isDemoMode = false;
+        sessionStorage.setItem('yunseul_id_token', idToken);
+        sessionStorage.setItem('yunseul_user_email', currentUserEmail);
+
+        enterMainScreen(`${result.user.name} (${result.user.email})`, false);
+        renderRecentRows(result.recentRows || []);
+        showBanner('환영합니다! 승인된 계정으로 로그인되었습니다.', 'success');
+      } catch (err) {
+        showBanner('서버와 통신하지 못했습니다. Apps Script 웹 앱 주소를 확인해 주세요.', 'error');
+      }
+    }
+
+    function enterMainScreen(label, demo = false) {
+      loginSection.classList.add('hidden');
+      mainSection.classList.remove('hidden');
+      userEmailLabel.textContent = label;
+      if (demo) {
+        userStatusDot.classList.add('demo');
+      } else {
+        userStatusDot.classList.remove('demo');
+      }
+    }
+
+    // 체험 모드 열기
+    document.getElementById('startDemoBtn').addEventListener('click', () => {
+      isDemoMode = true;
+      clearBanner();
+      enterMainScreen('체험 모드 (실제 시트 저장 전 테스트)', true);
+      renderRecentRows([
+        {
+          date: getTodayString(),
+          category: '원데이 클래스',
+          people: 2,
+          amount: 70000,
+          payment: '카드',
+          channel: '인스타그램',
+          memo: '예시 데이터'
+        }
+      ]);
+      showBanner('체험 모드가 열렸습니다! 음성으로 말하거나 예시 버튼을 눌러 테스트해 보세요.', 'success');
+    });
+
+    // 로그아웃
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      currentIdToken = '';
+      currentUserEmail = '';
+      isDemoMode = false;
+      sessionStorage.removeItem('yunseul_id_token');
+      sessionStorage.removeItem('yunseul_user_email');
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        window.google.accounts.id.disableAutoSelect();
+      }
+      mainSection.classList.add('hidden');
+      loginSection.classList.remove('hidden');
+      clearBanner();
+    });
+
+    /**
+     * ============================================================================
+     * 🎙️ 휴대폰 음성 인식 (Web Speech API)
+     * ============================================================================
+     */
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const micBtn = document.getElementById('micBtn');
+      const micBtnText = document.getElementById('micBtnText');
+      const speechInput = document.getElementById('speechInput');
+
+      if (!SpeechRecognition) {
+        micBtnText.textContent = '키보드의 마이크(🎤) 버튼을 눌러 말해주세요';
+        micBtn.addEventListener('click', () => {
+          speechInput.focus();
+          showBanner('이 브라우저에서는 아래 입력창을 누른 뒤 휴대폰 키보드의 마이크(🎤) 버튼을 누르면 바로 받아쓰기가 됩니다!', 'success');
+        });
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = 'ko-KR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        isListening = true;
+        micBtn.classList.add('listening');
+        micBtnText.textContent = '듣고 있어요... 말씀해 주세요 (탭하면 종료)';
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        speechInput.value = transcript.trim();
+        // 음성 인식이 끝나면 자동으로 AI 정리 실행!
+        handleParseText();
+      };
+
+      recognition.onerror = () => {
+        isListening = false;
+        micBtn.classList.remove('listening');
+        micBtnText.textContent = '눌러서 말하기 (음성 인식)';
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        micBtn.classList.remove('listening');
+        micBtnText.textContent = '눌러서 말하기 (음성 인식)';
+      };
+
+      micBtn.addEventListener('click', () => {
+        if (isListening) {
+          recognition.stop();
+        } else {
+          clearBanner();
+          recognition.start();
+        }
+      });
+    }
+
+    // 예시 문장 칩 클릭
+    document.querySelectorAll('.example-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        document.getElementById('speechInput').value = chip.dataset.sample;
+        handleParseText();
+      });
+    });
+
+    /**
+     * ============================================================================
+     * 🤖 AI 7개 항목 자동 정리 (서버 Gemini 호출 + 체험 모드 내장 분석기)
+     * ============================================================================
+     */
+    document.getElementById('parseBtn').addEventListener('click', handleParseText);
+
+    async function handleParseText() {
+      const text = document.getElementById('speechInput').value.trim();
+      if (!text) {
+        showBanner('먼저 수업·판매 내용을 말씀하시거나 입력해 주세요.', 'error');
+        return;
+      }
+
+      const parseBtn = document.getElementById('parseBtn');
+      const aiModeBadge = document.getElementById('aiModeBadge');
+
+      // 체험 모드이거나 아직 서버 URL 연결 전이면 내장 스마트 분석기로 즉시 정리
+      if (isDemoMode || !getAppsScriptUrl()) {
+        const parsed = localSmartParse(text);
+        fillFormWithParsedData(parsed);
+        aiModeBadge.textContent = '✨ 자동 정리 완료 (내용을 확인해 주세요)';
+        showBanner('말씀하신 내용을 7개 항목으로 정리했습니다. 확인 후 저장을 눌러주세요!', 'success');
+        document.getElementById('confirmCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        return;
+      }
+
+      try {
+        parseBtn.disabled = true;
+        parseBtn.textContent = '🤖 AI가 항목별로 정리하고 있습니다...';
+
+        const res = await fetch(getAppsScriptUrl(), {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'parse',
+            idToken: currentIdToken,
+            text: text
+          })
+        });
+
+        const result = await res.json();
+        if (!result.ok) {
+          showBanner(result.error || '분석 중 오류가 발생했습니다.', 'error');
+          return;
+        }
+
+        fillFormWithParsedData(result.data);
+        aiModeBadge.textContent = result.aiUsed ? '🤖 Gemini AI 정리 완료' : '✨ 자동 정리 완료';
+        showBanner('항목별 정리가 완료되었습니다! 내용 확인 후 아래 초록색 저장 버튼을 눌러주세요.', 'success');
+        document.getElementById('confirmCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (err) {
+        // 네트워크 오류 시에도 멈추지 않고 내장 분석기로 정리
+        const parsed = localSmartParse(text);
+        fillFormWithParsedData(parsed);
+        showBanner('임시 오프라인 모드로 항목을 정리했습니다. 내용을 확인해 주세요.', 'success');
+      } finally {
+        parseBtn.disabled = false;
+        parseBtn.textContent = '🤖 AI로 7개 항목 자동 정리하기';
+      }
+    }
+
+    // 브라우저 내장 한국어 분석기 (체험 모드 및 백업용)
+    function localSmartParse(text) {
+      let date = getTodayString();
+      const now = new Date();
+      if (text.includes('어제')) {
+        const yest = new Date(now.getTime() - 86400000);
+        date = `${yest.getFullYear()}-${String(yest.getMonth() + 1).padStart(2, '0')}-${String(yest.getDate()).padStart(2, '0')}`;
+      }
+
+      let category = '원데이 클래스';
+      if (/취미|자격증|전문가|정규|조향사/.test(text)) category = '취미·자격증반';
+      else if (/완제품|답례품|판매|디퓨저|룸스프레이|선물|구매/.test(text)) category = '완제품·답례품 판매';
+      else if (/원데이|클래스|수업|체험/.test(text)) category = '원데이 클래스';
+      else category = '기타';
+
+      let people = 1;
+      const pMatch = text.match(/(\d+)\s*(명|분|인)/);
+      if (pMatch) people = parseInt(pMatch[1], 10);
+      else if (/커플|두\s*명|두\s*분/.test(text)) people = 2;
+      else if (/세\s*명|세\s*분/.test(text)) people = 3;
+
+      let amount = 0;
+      const manCheon = text.match(/(\d+)\s*만\s*(\d+)\s*천\s*원?/);
+      const manMatch = text.match(/(\d+(?:\.\d+)?)\s*만\s*원?/);
+      const wonMatch = text.match(/(\d{1,3}(?:,\d{3})+|\d{4,8})\s*원?/);
+      if (manCheon) amount = parseInt(manCheon[1], 10) * 10000 + parseInt(manCheon[2], 10) * 1000;
+      else if (manMatch) amount = Math.round(parseFloat(manMatch[1]) * 10000);
+      else if (wonMatch) amount = parseInt(wonMatch[1].replace(/,/g, ''), 10);
+
+      let payment = '카드';
+      if (/포항사랑|상품권|지역화폐/.test(text)) payment = '포항사랑상품권';
+      else if (/네이버\s*페이/.test(text)) payment = '네이버페이';
+      else if (/계좌|이체|입금/.test(text)) payment = '계좌이체';
+      else if (/현금/.test(text)) payment = '현금';
+      else if (/카드/.test(text)) payment = '카드';
+
+      let channel = '기타';
+      if (/인스타|릴스|디엠|DM/i.test(text)) channel = '인스타그램';
+      else if (/네이버\s*예약|예약/.test(text)) channel = '네이버 예약';
+      else if (/블로그|검색|네이버/.test(text)) channel = '네이버 검색/블로그';
+      else if (/지인|소개|추천|친구/.test(text)) channel = '지인 추천';
+      else if (/재방문|단골/.test(text)) channel = '재방문';
+      else if (/지나가다|워크인|길가다/.test(text)) channel = '워크인(지나가다)';
+      else if (/당근/.test(text)) channel = '당근';
+
+      // 특이사항 메모 추출 (마지막 쉼표 뒤 구문 등)
+      let memo = '';
+      const parts = text.split(/[,/]/).map(s => s.trim()).filter(Boolean);
+      if (parts.length >= 3) {
+        memo = parts.slice(2).join(', ');
+      }
+
+      return { date, category, people, amount, payment, channel, memo };
+    }
+
+    function fillFormWithParsedData(data) {
+      fieldDate.value = data.date || getTodayString();
+      fieldCategory.value = data.category || '원데이 클래스';
+      fieldPeople.value = data.people || 1;
+      fieldAmount.value = data.amount !== undefined ? data.amount : 0;
+      fieldPayment.value = data.payment || '카드';
+      fieldChannel.value = data.channel || '기타';
+      fieldMemo.value = data.memo || '';
+
+      syncActivePills('categoryPills', fieldCategory.value);
+      syncActivePills('paymentPills', fieldPayment.value);
+      syncActivePills('channelPills', fieldChannel.value);
+      updatePreviewSummary();
+    }
+
+    /**
+     * ============================================================================
+     * 🎛️ 폼 버튼 조작 및 실시간 한 줄 미리보기 업데이트
+     * ============================================================================
+     */
+    function syncActivePills(containerId, currentValue) {
+      const container = document.getElementById(containerId);
+      container.querySelectorAll('.pill-btn').forEach((btn) => {
+        if (btn.dataset.val === currentValue) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    // 구분 칩 선택
+    document.querySelectorAll('#categoryPills .pill-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        fieldCategory.value = btn.dataset.val;
+        syncActivePills('categoryPills', btn.dataset.val);
+        updatePreviewSummary();
+      });
+    });
+
+    // 결제수단 칩 선택
+    document.querySelectorAll('#paymentPills .pill-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        fieldPayment.value = btn.dataset.val;
+        syncActivePills('paymentPills', btn.dataset.val);
+        updatePreviewSummary();
+      });
+    });
+
+    // 유입경로 칩 선택
+    document.querySelectorAll('#channelPills .pill-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        fieldChannel.value = btn.dataset.val;
+        syncActivePills('channelPills', btn.dataset.val);
+        updatePreviewSummary();
+      });
+    });
+
+    // 빠른 금액 버튼
+    document.querySelectorAll('.amt-quick').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        fieldAmount.value = btn.dataset.amt;
+        updatePreviewSummary();
+      });
+    });
+
+    // 인원 +/- 버튼
+    document.getElementById('peopleMinusBtn').addEventListener('click', () => {
+      const current = parseInt(fieldPeople.value, 10) || 1;
+      fieldPeople.value = Math.max(1, current - 1);
+      updatePreviewSummary();
+    });
+
+    document.getElementById('peoplePlusBtn').addEventListener('click', () => {
+      const current = parseInt(fieldPeople.value, 10) || 1;
+      fieldPeople.value = current + 1;
+      updatePreviewSummary();
+    });
+
+    // 입력값 변경 시 실시간 요약 업데이트
+    [fieldDate, fieldPeople, fieldAmount, fieldPayment, fieldChannel, fieldMemo].forEach((el) => {
+      el.addEventListener('input', () => {
+        if (el === fieldPayment) syncActivePills('paymentPills', fieldPayment.value.trim());
+        if (el === fieldChannel) syncActivePills('channelPills', fieldChannel.value.trim());
+        updatePreviewSummary();
+      });
+    });
+
+    function updatePreviewSummary() {
+      const amt = parseInt(fieldAmount.value, 10) || 0;
+      const formattedAmt = amt.toLocaleString('ko-KR') + '원';
+      amountPreview.textContent = formattedAmt;
+
+      const d = fieldDate.value || getTodayString();
+      const c = fieldCategory.value || '원데이 클래스';
+      const p = (parseInt(fieldPeople.value, 10) || 1) + '명';
+      const pay = fieldPayment.value.trim() || '카드';
+      const ch = fieldChannel.value.trim() || '기타';
+      const memo = fieldMemo.value.trim() || '-';
+
+      oneLineSummaryText.textContent = `${d} | ${c} | ${p} | ${formattedAmt} | ${pay} | ${ch} | ${memo}`;
+    }
+
+    /**
+     * ============================================================================
+     * ✅ 구글 시트 「윤슬향방 매출 장부」에 한 줄 저장하기
+     * ============================================================================
+     */
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      const item = {
+        date: fieldDate.value || getTodayString(),
+        category: fieldCategory.value || '원데이 클래스',
+        people: parseInt(fieldPeople.value, 10) || 1,
+        amount: parseInt(fieldAmount.value, 10) || 0,
+        payment: fieldPayment.value.trim() || '카드',
+        channel: fieldChannel.value.trim() || '기타',
+        memo: fieldMemo.value.trim()
+      };
+
+      const saveBtn = document.getElementById('saveBtn');
+
+      // 체험 모드일 때
+      if (isDemoMode) {
+        prependDemoRecentRow(item);
+        document.getElementById('speechInput').value = '';
+        fieldMemo.value = '';
+        updatePreviewSummary();
+        showBanner('✨ [체험 모드] 아래 최근 내역에 한 줄이 추가되었습니다! 실제 구글 시트에 저장하려면 우측 상단 [⚙️ 설정·연결]을 완료해 주세요.', 'success');
+        return;
+      }
+
+      if (!getAppsScriptUrl()) {
+        showBanner('우측 상단 [⚙️ 설정·연결]에서 Apps Script 웹 앱 URL을 먼저 설정해 주세요.', 'error');
+        return;
+      }
+
+      try {
+        saveBtn.disabled = true;
+        saveBtn.textContent = '⏳ 구글 시트에 한 줄 저장 중...';
+
+        const res = await fetch(getAppsScriptUrl(), {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'save',
+            idToken: currentIdToken,
+            item: item
+          })
+        });
+
+        const result = await res.json();
+        if (!result.ok) {
+          showBanner(result.error || '저장 중 오류가 발생했습니다.', 'error');
+          return;
+        }
+
+        // 저장 성공 후 입력창 초기화 및 최근 내역 갱신
+        document.getElementById('speechInput').value = '';
+        fieldMemo.value = '';
+        updatePreviewSummary();
+        renderRecentRows(result.recentRows || []);
+        showBanner('🎉 「윤슬향방 매출 장부」 구글 시트에 한 줄 저장되었습니다!', 'success');
+      } catch (err) {
+        showBanner('구글 시트 저장 중 통신 오류가 발생했습니다. 인터넷 연결을 확인해 주세요.', 'error');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = '✅ 확인 완료! 구글 시트에 한 줄 저장';
+      }
+    });
+
+    function renderRecentRows(rows) {
+      const container = document.getElementById('recentList');
+      if (!rows || rows.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:14px; color:var(--text-sub); font-size:13px;">
+            아직 장부에 기록된 내역이 없습니다.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = rows.map((r) => {
+        const amt = (Number(r.amount) || 0).toLocaleString('ko-KR') + '원';
+        const memoText = r.memo ? ` · 📝 ${escapeHtml(r.memo)}` : '';
+        return `
+          <div class="recent-item">
+            <div class="recent-left">
+              <div class="recent-top">${escapeHtml(r.date)} · ${escapeHtml(r.category)} (${Number(r.people) || 1}명)</div>
+              <div class="recent-sub">${escapeHtml(r.payment)} · ${escapeHtml(r.channel)}${memoText}</div>
+            </div>
+            <div class="recent-amount">${amt}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    let demoRows = [];
+    function prependDemoRecentRow(item) {
+      demoRows.unshift(item);
+      renderRecentRows(demoRows.slice(0, 5));
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /**
+     * ============================================================================
+     * ⚙️ 설정 모달 열기 / 저장
+     * ============================================================================
+     */
+    const settingsModal = document.getElementById('settingsModal');
+    document.getElementById('openSettingsBtn').addEventListener('click', () => {
+      document.getElementById('cfgScriptUrl').value = getAppsScriptUrl();
+      document.getElementById('cfgClientId').value = getGoogleClientId();
+      settingsModal.classList.add('open');
+    });
+
+    document.getElementById('closeSettingsBtn').addEventListener('click', () => {
+      settingsModal.classList.remove('open');
+    });
+
+    document.getElementById('saveConfigBtn').addEventListener('click', () => {
+      const urlVal = document.getElementById('cfgScriptUrl').value.trim();
+      const cidVal = document.getElementById('cfgClientId').value.trim();
+      localStorage.setItem('yunseul_script_url', urlVal);
+      localStorage.setItem('yunseul_client_id', cidVal);
+      settingsModal.classList.remove('open');
+      initGoogleSignIn();
+      showBanner('연결 설정이 저장되었습니다!', 'success');
+    });
+  </script>
+</body>
+</html>
